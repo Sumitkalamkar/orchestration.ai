@@ -1,0 +1,14 @@
+# Application
+fastapi
+uvicorn
+langchain-groq
+langgraph
+python-dotenv
+
+# Testing
+pytest
+pytest-cov
+httpx
+
+# Code quality
+pylint
