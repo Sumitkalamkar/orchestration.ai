@@ -112,14 +112,12 @@ pipeline {
             steps {
                 echo 'Deploying application...'
                 sh '''
-                    # Stop existing container if running
                     docker stop report_gen_app || true
                     docker rm report_gen_app || true
-
-                    # Run new container with credentials from Jenkins
+        
                     docker run -d \
                         --name report_gen_app \
-                        --network devops_network \
+                        --network ec2-user_devops_network \
                         -p 8000:8000 \
                         -e GROQ_API_KEY=$GROQ_API_KEY \
                         -e LANGSMITH_API_KEY=$LANGSMITH_API_KEY \
@@ -127,7 +125,7 @@ pipeline {
                         -e LANGSMITH_ENDPOINT=$LANGSMITH_ENDPOINT \
                         -e LANGSMITH_PROJECT=$LANGSMITH_PROJECT \
                         ${DOCKER_IMAGE}:latest
-
+        
                     echo "App deployed at http://localhost:8000"
                 '''
             }
