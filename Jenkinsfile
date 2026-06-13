@@ -5,22 +5,27 @@ pipeline {
         DOCKER_IMAGE = 'report-gen-app'
         DOCKER_TAG = "${BUILD_NUMBER}"
         SONAR_PROJECT_KEY = 'report-gen'
+        GROQ_API_KEY = credentials('GROQ_API_KEY')
+        LANGSMITH_API_KEY = credentials('LANGSMITH_API_KEY')
+        LANGSMITH_PROJECT = credentials('LANGSMITH_PROJECT')
+        LANGSMITH_TRACING = credentials('LANGSMITH_TRACING')
+        LANGSMITH_ENDPOINT = credentials('LANGSMITH_ENDPOINT')
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                echo '📥 Checking out source code...'
+                echo 'Checking out source code...'
                 checkout scm
             }
         }
 
         stage('Setup Python') {
             steps {
-                echo '🐍 Setting up Python environment...'
+                echo 'Setting up Python environment...'
                 sh '''
-                    python3.11 -m venv venv
+                    python3 -m venv venv
                     . venv/bin/activate
                     pip install --upgrade pip
                     pip install -r requirements.txt
@@ -31,7 +36,7 @@ pipeline {
 
         stage('Lint') {
             steps {
-                echo '🔍 Running linter...'
+                echo 'Running linter...'
                 sh '''
                     . venv/bin/activate
                     pylint graph.py backend.py --fail-under=7.0 || true
@@ -41,7 +46,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                echo '🧪 Running tests...'
+                echo 'Running tests...'
                 sh '''
                     . venv/bin/activate
                     pytest tests/ --cov=. --cov-report=xml --cov-report=term || true
@@ -51,7 +56,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                echo '📊 Running SonarQube analysis...'
+                echo 'Running SonarQube analysis...'
                 withSonarQubeEnv('SonarQube') {
                     sh '''
                         sonar-scanner \
@@ -67,7 +72,7 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                echo '🚦 Checking SonarQube Quality Gate...'
+                echo 'Checking SonarQube Quality Gate...'
                 timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
@@ -76,7 +81,7 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                echo '🐳 Building Docker image...'
+                echo 'Building Docker image...'
                 sh '''
                     docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
                     docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
@@ -86,7 +91,7 @@ pipeline {
 
         stage('Docker Push') {
             steps {
-                echo '📤 Pushing Docker image to registry...'
+                echo 'Pushing Docker image to DockerHub...'
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-credentials',
                     usernameVariable: 'DOCKER_USER',
@@ -105,10 +110,24 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo '🚀 Deploying application...'
+                echo 'Deploying application...'
                 sh '''
-                    docker-compose down || true
-                    docker-compose up -d app
+                    # Stop existing container if running
+                    docker stop report_gen_app || true
+                    docker rm report_gen_app || true
+
+                    # Run new container with credentials from Jenkins
+                    docker run -d \
+                        --name report_gen_app \
+                        --network devops_network \
+                        -p 8000:8000 \
+                        -e GROQ_API_KEY=$GROQ_API_KEY \
+                        -e LANGSMITH_API_KEY=$LANGSMITH_API_KEY \
+                        -e LANGSMITH_TRACING=$LANGSMITH_TRACING \
+                        -e LANGSMITH_ENDPOINT=$LANGSMITH_ENDPOINT \
+                        -e LANGSMITH_PROJECT=$LANGSMITH_PROJECT \
+                        ${DOCKER_IMAGE}:latest
+
                     echo "App deployed at http://localhost:8000"
                 '''
             }
@@ -117,13 +136,13 @@ pipeline {
 
     post {
         success {
-            echo '✅ Pipeline completed successfully!'
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo '❌ Pipeline failed. Check logs above.'
+            echo 'Pipeline failed. Check logs above.'
         }
         always {
-            echo '🧹 Cleaning up workspace...'
+            echo 'Cleaning up workspace...'
             sh 'docker system prune -f || true'
         }
     }
