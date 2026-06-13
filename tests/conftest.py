@@ -49,7 +49,7 @@ def make_mock_sections():
 
 # ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def mock_graph_state():
     """Returns a fake LangGraph final state."""
     return {
@@ -60,13 +60,13 @@ def mock_graph_state():
     }
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def mock_planner_output():
     """Returns a fake planner structured output."""
     return make_mock_sections()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def client(mock_graph_state, mock_planner_output):
     """
     TestClient with all LLM calls patched out.
