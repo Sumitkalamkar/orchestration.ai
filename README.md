@@ -16,7 +16,7 @@
 [![AWS](https://img.shields.io/badge/AWS-EC2%20%7C%20S3%20%7C%20CloudFront-FF9900?style=flat-square&logo=amazonaws&logoColor=white)](https://aws.amazon.com)
 [![License](https://img.shields.io/badge/License-MIT-00D4AA?style=flat-square)](LICENSE)
 
-[Live Demo](#live-demo) • [Architecture](#architecture) • [Setup](#setup) • [CI/CD Pipeline](#cicd-pipeline) • [API Docs](#api-endpoints)
+• [Architecture](#architecture) • [Setup](#setup) • [CI/CD Pipeline](#cicd-pipeline) • [API Docs](#api-endpoints)
 
 </div>
 
