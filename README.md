@@ -111,32 +111,32 @@ Developer Push
 > **Flutter UI — Home Screen**
 
 <!-- Add screenshot here -->
-![Home Screen](docs/screenshots/home_screen.png)
+![Home Screen](Flutter UI — Home Screen.png)
 
 > **Flutter UI — Report Generation Progress**
 
 <!-- Add screenshot here -->
-![Report Progress](docs/screenshots/report_progress.png)
+![Report Progress](Flutter UI — Report Generation Progress.png)
 
 > **Flutter UI — Generated Report**
 
 <!-- Add screenshot here -->
-![Report View](docs/screenshots/report_view.png)
+![Report View](Flutter UI — Generated Report.png)
 
 > **LangGraph Studio — Graph Visualization**
 
 <!-- Add screenshot here -->
-![LangGraph Studio](docs/screenshots/langgraph_studio.png)
+![LangGraph Studio](LangGraph Studio — Graph Visualization.png)
 
 > **Jenkins CI/CD Pipeline — Build #11 (All Stages Passed)**
 
 <!-- Add screenshot here -->
-![Jenkins Pipeline](docs/screenshots/jenkins_pipeline.png)
+![Jenkins Pipeline](Jenkins CICD Pipeline Build.png)
 
 > **SonarQube — Quality Gate Passed**
 
 <!-- Add screenshot here -->
-![SonarQube](docs/screenshots/sonarqube.png)
+![SonarQube](SonarQube Quality Gate Passed.png)
 
 ---
 
